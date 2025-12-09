@@ -17,4 +17,4 @@ source mfal_env/bin/activate
 cd experiments/baselines
 
 # Run experiment
-python run_baseline.py --model blr --acquisition ei --score_type mmgbsa --n_iterations=3500 --n_initial 100 --save_results
+python run_baseline.py --model blr --acquisition ucb --score_type mmgbsa --n_iterations=3500 --n_initial 100 --save_results

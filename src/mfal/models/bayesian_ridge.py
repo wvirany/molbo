@@ -48,23 +48,23 @@ class BayesianRidgeModel(SurrogateModel):
         self.X_train = None
         self.y_train = None
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X_train: np.ndarray, y_train: np.ndarray):
         """
         Fit model to training data.
         """
-        self.model.fit(X, y)
+        self.model.fit(X_train, y_train)
         self.is_fitted = True
 
         # Store training data
-        self.X_train = X
-        self.y_train = y
+        self.X_train = X_train
+        self.y_train = y_train
 
-    def predict(self, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def predict(self, X_test: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Predict mean and standard deviation.
 
         Args:
-            X: Test features (n_test, n_features)
+            X_test: Test features (n_test, n_features)
 
         Returns:
             mean: Predicted means (n_test,)
@@ -73,7 +73,7 @@ class BayesianRidgeModel(SurrogateModel):
         if not self.is_fitted:
             raise RuntimeError("Model must be fitted before predicting.")
 
-        mean, std = self.model.predict(X, return_std=True)
+        mean, std = self.model.predict(X_test, return_std=True)
 
         return mean, std
 
@@ -89,7 +89,7 @@ class BayesianRidgeModel(SurrogateModel):
             y_new: New target(s) (n_new,)
         """
         if not self.is_fitted:
-            # First update, juset fit model
+            # First update, just fit model
             self.fit(X_new, y_new)
         else:
             # Concatenate with existing data
