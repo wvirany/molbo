@@ -12,17 +12,17 @@ class RandomModel(SurrogateModel):
         """Initialize random model."""
         pass
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X_train: np.ndarray, y_train: np.ndarray):
         """
         No-op fit for random model.
         """
         pass
 
-    def predict(self, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def predict(self, X_test: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Return placeholders for mean and std.
         """
-        n = len(X)
+        n = len(X_test)
         mean = np.zeros(n)
         std = np.ones(n)
         return mean, std

@@ -7,7 +7,7 @@ class SurrogateModel(ABC):
     """Base class for surrogate models."""
 
     @abstractmethod
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X_train: np.ndarray, y_train: np.ndarray):
         """
         Fit model to training data.
 
@@ -18,12 +18,12 @@ class SurrogateModel(ABC):
         pass
 
     @abstractmethod
-    def predict(self, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def predict(self, X_test: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Predict mean and standard deviation for test points.
 
         Args:
-            X: Test features (n_test, n_features)
+            X_test: Test features (n_test, n_features)
 
         Returns:
             mean: Predicted means (n_test,)
