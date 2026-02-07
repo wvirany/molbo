@@ -8,9 +8,10 @@ import warnings
 from pathlib import Path
 
 import wandb
-from mfal.data import compute_top_k_indices, get_oracle_function, load_mcl1_data
-from mfal.utils.al_loop import run_al_loop
-from mfal.utils.embeddings import get_embeddings
+
+from molbo.data import compute_top_k_indices, get_oracle_function, load_mcl1_data
+from molbo.utils.al_loop import run_al_loop
+from molbo.utils.embeddings import get_embeddings
 
 warnings.filterwarnings("ignore")
 

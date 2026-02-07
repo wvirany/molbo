@@ -3,7 +3,7 @@ from typing import Set
 
 import numpy as np
 
-from mfal.models.base import SurrogateModel
+from molbo.models.base import SurrogateModel
 
 
 class AcquisitionFunction(ABC):

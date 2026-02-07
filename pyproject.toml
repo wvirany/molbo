@@ -3,15 +3,16 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mfal"
+name = "molbo"
 version = "0.1.0"
-description = "Multi-fidelity active learning"
+description = "Bayesian optimization for molecules"
 requires-python = ">=3.8"
 dependencies = [
     "numpy",
     "pandas",
     "rdkit",
     "torch",
+    "gauche",
     "gpytorch",
     "botorch",
     "tqdm",
@@ -25,8 +26,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["src"]
-include = ["mfal*"]
+include = ["molbo*"]
 
 [tool.black]
 line-length = 100
@@ -41,6 +41,7 @@ lint.select = [
 ]
 lint.ignore = [
   "E501",    # Line too long -- let black handle it
+  "E731",    # Lambda expressions -- we allow these
 ]
 
 [tool.mypy]

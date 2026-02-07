@@ -2,8 +2,8 @@ from typing import Set
 
 import numpy as np
 
-from mfal.acquisition.base import AcquisitionFunction
-from mfal.models.base import SurrogateModel
+from molbo.acquisition.base import AcquisitionFunction
+from molbo.models.base import SurrogateModel
 
 
 class RandomAcquisition(AcquisitionFunction):

@@ -1,11 +1,11 @@
 from typing import Callable, List
 
 import numpy as np
+import wandb
 from tqdm import tqdm
 
-import wandb
-from mfal.acquisition.base import AcquisitionFunction
-from mfal.models.base import SurrogateModel
+from molbo.acquisition.base import AcquisitionFunction
+from molbo.models.base import SurrogateModel
 
 
 def initialize_centroid(embeddings: np.ndarray):

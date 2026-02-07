@@ -3,8 +3,8 @@ from typing import Set
 import numpy as np
 from scipy.stats import norm
 
-from mfal.acquisition.base import AcquisitionFunction
-from mfal.models.base import SurrogateModel
+from molbo.acquisition.base import AcquisitionFunction
+from molbo.models.base import SurrogateModel
 
 
 class ExpectedImprovement(AcquisitionFunction):

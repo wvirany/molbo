@@ -2,7 +2,7 @@ import gpytorch
 import torch
 from gauche.kernels.fingerprint_kernels.minmax_kernel import MinMaxKernel
 
-from mfal.models.base import SurrogateModel
+from molbo.models.base import SurrogateModel
 
 
 class ExactGPModel(gpytorch.models.ExactGP):

@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.linear_model import BayesianRidge
 
-from mfal.models.base import SurrogateModel
+from molbo.models.base import SurrogateModel
 
 
 class BayesianRidgeModel(SurrogateModel):
