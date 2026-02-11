@@ -33,13 +33,14 @@ def plot_1d(bo_loop: BOLoop):
     with torch.no_grad():
         ax = axes[0]
 
-        ax.plot(X, f(X), label="Objective function")
-        ax.plot(X, mean, label="Posterior mean")
+        ax.plot(X, f(X), color="red", label="Objective function")
+        ax.plot(X, mean, color="blue", label="Posterior mean")
         ax.fill_between(
             X.squeeze(),
             mean.squeeze() - std,
             mean.squeeze() + std,
             alpha=0.2,
+            color="blue",
             label="Posterior std",
         )
         ax.scatter(train_X, f(train_X), color="k", s=20, zorder=2, label="Observed data")

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import torch
 from botorch.acquisition.analytic import (
     ExpectedImprovement,
     LogExpectedImprovement,
@@ -7,6 +8,7 @@ from botorch.acquisition.analytic import (
     ProbabilityOfImprovement,
     UpperConfidenceBound,
 )
+from botorch.acquisition.knowledge_gradient import qKnowledgeGradient
 from botorch.acquisition.thompson_sampling import PathwiseThompsonSampling
 
 from molbo.models.base import SurrogateModel
@@ -82,4 +84,19 @@ class ThompsonSampling(Acquisition):
 
     def __call__(self, X):
         acq_func = PathwiseThompsonSampling(model=self.model)
+        return acq_func(X)
+
+
+class KnowledgeGradient(Acquisition):
+    def __init__(self, model: SurrogateModel):
+        self.model = model.model
+
+    def __call__(self, X):
+        # Compute current best posterior mean
+        with torch.no_grad():
+            current_value = self.model.posterior(self.model.train_inputs[0]).mean.max()
+
+        acq_func = qKnowledgeGradient(
+            model=self.model, num_fantasies=1, current_value=current_value
+        )
         return acq_func(X)
