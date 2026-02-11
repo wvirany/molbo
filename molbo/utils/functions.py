@@ -22,7 +22,7 @@ class Toy1DFunction(SyntheticTestFunction):
             X: B x d tensor
 
         Returns:
-            B-dim tensor
+            B x m tensor
         """
         pdf = lambda x, mean, std_dev: (
             1 / (std_dev * torch.sqrt(2 * torch.tensor(torch.pi)))
@@ -35,4 +35,4 @@ class Toy1DFunction(SyntheticTestFunction):
         g5 = lambda x: 0.5 * pdf(x, mean=torch.tensor(8), std_dev=torch.tensor(1.2))
         g6 = lambda x: 0.1 * pdf(x, mean=torch.tensor(10.1), std_dev=torch.tensor(0.6))
 
-        return (10 * (g1(X) + g2(X) + g3(X) + g4(X) + g5(X) + g6(X))).squeeze()
+        return (10 * (g1(X) + g2(X) + g3(X) + g4(X) + g5(X) + g6(X))).squeeze(-1)

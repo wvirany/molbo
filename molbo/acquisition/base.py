@@ -1,32 +1,24 @@
 from abc import ABC, abstractmethod
-from typing import Set
 
-import numpy as np
+from botorch.acquisition import LogExpectedImprovement
 
 from molbo.models.base import SurrogateModel
 
 
-class AcquisitionFunction(ABC):
-    """Base class for acquisition functions."""
-
+class Acquisition(ABC):
     @abstractmethod
-    def select_next(
-        self,
-        model: SurrogateModel,
-        embeddings: np.ndarray,
-        queried_indices: Set[int],
-        current_best: float,
-    ) -> int:
-        """
-        Select next point to query.
-
-        Args:
-            model: Trained surrogate model
-            embeddings: All candidate embeddings (N, n_features)
-            queried_indices: Set of observed indices
-            current_best: Best score observed so far (necessary for EI)
-
-        Returns:
-            next_idx: Index of next point to query
-        """
+    def __call__(self, X):
         pass
+
+
+class LogEI(Acquisition):
+    def __init__(self, model: SurrogateModel):
+        self.model = model.model
+        self.best_f = model.train_y.max().item()
+
+    def __call__(self, X):
+        acq_func = LogExpectedImprovement(
+            model=self.model,
+            best_f=self.best_f,
+        )
+        return acq_func(X)

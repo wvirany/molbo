@@ -41,7 +41,8 @@ lint.select = [
 ]
 lint.ignore = [
   "E501",    # Line too long -- let black handle it
-  "E731",    # Lambda expressions -- we allow these
+  "E731",    # Lambda expressions
+  "F401",    # Unused imports
 ]
 
 [tool.mypy]

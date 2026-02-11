@@ -3,6 +3,8 @@ from sklearn.linear_model import BayesianRidge
 
 from molbo.models.base import SurrogateModel
 
+# CURRENTLY DEPRECATED
+
 
 class BayesianRidgeModel(SurrogateModel):
     """

@@ -2,6 +2,8 @@ import numpy as np
 
 from molbo.models.base import SurrogateModel
 
+# CURRENTLY DEPRECATED
+
 
 class RandomModel(SurrogateModel):
     """
