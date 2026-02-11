@@ -14,6 +14,7 @@ class Toy1DFunction(SyntheticTestFunction):
         self.dim = 1
         self._bounds = [(0.0, 10.0)]
         self.continuous_inds = [0]
+        self.max = 1.7910193051233148
         super().__init__(noise_std=noise_std, negate=negate)
 
     def _evaluate_true(self, X):

@@ -38,3 +38,9 @@ class GPModel(SurrogateModel):
         with torch.no_grad():
             posterior = self.model.posterior(X)
             return posterior.mean, posterior.stddev
+
+    def loss(self):
+        self.model.eval()
+        with torch.no_grad():
+            output = self.model(self.train_X)
+            return self.mll(output, self.train_y.squeeze())

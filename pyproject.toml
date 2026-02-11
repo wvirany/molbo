@@ -43,6 +43,8 @@ lint.ignore = [
   "E501",    # Line too long -- let black handle it
   "E731",    # Lambda expressions
   "F401",    # Unused imports
+  "F403",    # 'from module import *' used; unable to detect undefined names
+  "F405",    # Name may be undefined, or defined from star imports: module
 ]
 
 [tool.mypy]

@@ -1,0 +1,9 @@
+experiment:
+  name:
+  model: GP
+  acquisition: EI
+  num_iterations: 20
+  num_initial_points: 5
+  random_seed: 42
+
+...
