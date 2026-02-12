@@ -25,14 +25,14 @@ class BOLoop:
     def __init__(
         self,
         model: SurrogateModel,
-        acquisition: Acquisition,
+        acq_func: Acquisition,
         oracle: Oracle,
         is_continuous: bool = True,
         candidates: torch.Tensor = None,
         metrics=None,
     ):
         self.model = model
-        self.acquisition = acquisition
+        self.acq_func = acq_func
         self.oracle = oracle
         self.is_continuous = is_continuous
         self.candidates = candidates
@@ -57,29 +57,22 @@ class BOLoop:
         for i in range(n_iters):
             iter_start = time.time()
 
+            # Update model and acquisition function
             self.model.fit()
-            acq_func = self.acquisition(model=self.model)
-            # new_X, acq_val = acq_func.eval() - refactor to this
+            self.acq_func.update(self.model)
 
-            if self.is_continuous:
-                new_X, acq_val = optimize_acqf(
-                    acq_function=acq_func,
-                    bounds=self.oracle.bounds,
-                    q=1,
-                    num_restarts=5,
-                    raw_samples=20,
-                )
-            else:
-                new_X, acq_val = optimize_acqf_discrete(
-                    acq_function=acq_func,
-                    q=1,
-                    choices=self.candidates,
-                )
+            # Query acquisition function
+            new_X, acq_val = self.acq_func.get_observation(
+                self.oracle, self.is_continuous, self.candidates
+            )
 
+            # Evaluate oracle
             new_y = self.oracle(new_X).unsqueeze(-1)
 
+            # Update model training data
             self.model.update(new_X, new_y)
 
+            # Track BO loop history
             self.history["time_per_iter"].append(time.time() - iter_start)
             self.history["X_observed"] = torch.cat((self.history["X_observed"], new_X))
             self.history["y_observed"] = torch.cat((self.history["y_observed"], new_y))

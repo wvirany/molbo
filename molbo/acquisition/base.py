@@ -10,93 +10,126 @@ from botorch.acquisition.analytic import (
 )
 from botorch.acquisition.knowledge_gradient import qKnowledgeGradient
 from botorch.acquisition.thompson_sampling import PathwiseThompsonSampling
+from botorch.optim import optimize_acqf, optimize_acqf_discrete
 
 from molbo.models.base import SurrogateModel
 
 
 class Acquisition(ABC):
+    """Wrapper for BoTorch acquisition functions."""
+
+    def get_observation(self, oracle, is_continuous: bool = True, candidates=None):
+        if is_continuous:
+            new_X, acq_val = optimize_acqf(
+                acq_function=self.acq_func,
+                bounds=oracle.bounds,
+                q=1,
+                num_restarts=5,
+                raw_samples=20,
+            )
+        else:
+            new_X, acq_val = optimize_acqf_discrete(
+                acq_function=self.acq_func,
+                bounds=oracle.bounds,
+                q=1,
+                choices=candidates,
+            )
+
+        return new_X, acq_val
+
     @abstractmethod
-    def __call__(self, X):
+    def update(self, model: SurrogateModel):
+        """Updaate acquisition function with new surrogate model."""
         pass
 
-    # @abstractmethod
-    # def optimize():
-    #     pass
-
-    # @abstractmethod
-    # def sample():
-    #     pass
-
-
-class EI(Acquisition):
-    def __init__(self, model: SurrogateModel):
-        self.model = model.model
-        self.best_f = model.train_y.max().item()
-
     def __call__(self, X):
-        acq_func = ExpectedImprovement(model=self.model, best_f=self.best_f)
-        return acq_func(X)
+        return self.acq_func(X)
 
 
-class LogEI(Acquisition):
+class EIAcquisition(Acquisition):
+    """Expected improvement acquisition function."""
+
     def __init__(self, model: SurrogateModel):
-        self.model = model.model
+        self.update(model)
+
+    def update(self, model: SurrogateModel):
+        self.model = model
         self.best_f = model.train_y.max().item()
-
-    def __call__(self, X):
-        acq_func = LogExpectedImprovement(model=self.model, best_f=self.best_f)
-        return acq_func(X)
+        self.acq_func = ExpectedImprovement(model=model.model, best_f=self.best_f)
 
 
-class PI(Acquisition):
+class LogEIAcquisition(Acquisition):
+    """Log expected improvement acquisition function."""
+
     def __init__(self, model: SurrogateModel):
-        self.model = model.model
+        self.update(model)
+
+    def update(self, model: SurrogateModel):
+        self.model = model
         self.best_f = model.train_y.max().item()
-
-    def __call__(self, X):
-        acq_func = ProbabilityOfImprovement(model=self.model, best_f=self.best_f)
-        return acq_func(X)
+        self.acq_func = LogExpectedImprovement(model=model.model, best_f=self.best_f)
 
 
-class LogPI(Acquisition):
+class PIAcquisition(Acquisition):
+    """Probability of improvement acquisition function."""
+
     def __init__(self, model: SurrogateModel):
-        self.model = model.model
+        self.update(model)
+
+    def update(self, model: SurrogateModel):
+        self.model = model
         self.best_f = model.train_y.max().item()
-
-    def __call__(self, X):
-        acq_func = LogProbabilityOfImprovement(model=self.model, best_f=self.best_f)
-        return acq_func(X)
+        self.acq_func = ProbabilityOfImprovement(model=model.model, best_f=self.best_f)
 
 
-class UCB(Acquisition):
+class LogPIAcquisition(Acquisition):
+    """Log probability of improvement acquisition function."""
+
+    def __init__(self, model: SurrogateModel):
+        self.update(model)
+
+    def update(self, model: SurrogateModel):
+        self.model = model
+        self.best_f = model.train_y.max().item()
+        self.acq_func = LogProbabilityOfImprovement(model=model.model, best_f=self.best_f)
+
+
+class UCBAcquisition(Acquisition):
+    """UCB acquisition function."""
+
     def __init__(self, model: SurrogateModel, beta: float = 0.1):
-        self.model = model.model
         self.beta = beta
+        self.update(model)
 
-    def __call__(self, X):
-        acq_func = UpperConfidenceBound(model=self.model, beta=self.beta)
-        return acq_func(X)
+    def update(self, model: SurrogateModel):
+        self.model = model
+        self.acq_func = UpperConfidenceBound(model=model.model, beta=self.beta)
 
 
-class ThompsonSampling(Acquisition):
+class TSAcquisition(Acquisition):
+    """Thompson sampling acquisition function."""
+
     def __init__(self, model: SurrogateModel):
-        self.model = model.model
+        self.update(model)
 
-    def __call__(self, X):
-        acq_func = PathwiseThompsonSampling(model=self.model)
-        return acq_func(X)
+    def update(self, model: SurrogateModel):
+        self.model = model
+        self.acq_func = PathwiseThompsonSampling(model.model)
 
 
-class KnowledgeGradient(Acquisition):
-    def __init__(self, model: SurrogateModel):
-        self.model = model.model
+class KGAcquisition(Acquisition):
+    """Knowledge gradient acquisition function."""
 
-    def __call__(self, X):
-        # Compute current best posterior mean
+    def __init__(self, model: SurrogateModel, num_fantasies: int = 4):
+        self.num_fantasies = num_fantasies
+        self.update(model)
+
+    def update(self, model: SurrogateModel):
+        self.model = model
+
         with torch.no_grad():
-            current_value = self.model.posterior(self.model.train_inputs[0]).mean.max()
+            current_value = model.model.posterior(model.model.train_inputs[0]).mean.max()
 
-        acq_func = qKnowledgeGradient(
-            model=self.model, num_fantasies=1, current_value=current_value
+        self.acq_func = qKnowledgeGradient(
+            model=model.model, num_fantasies=self.num_fantasies, current_value=current_value
         )
-        return acq_func(X)
