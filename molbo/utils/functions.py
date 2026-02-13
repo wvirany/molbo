@@ -2,6 +2,19 @@ import torch
 from botorch.test_functions import SyntheticTestFunction
 
 
+def init_problem(seed: int = 42):
+    torch.manual_seed(seed)
+
+    f = Toy1DFunction()
+    bounds = f.bounds
+
+    n_init = 3
+    train_X = bounds[1] * torch.rand(n_init, 1, dtype=torch.float64)
+    train_y = f(train_X).unsqueeze(-1)
+
+    return train_X, train_y, f
+
+
 class Toy1DFunction(SyntheticTestFunction):
     """
     Sub-module of `SyntheticTestFunction`

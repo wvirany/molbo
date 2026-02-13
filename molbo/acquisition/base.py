@@ -97,7 +97,7 @@ class LogPIAcquisition(Acquisition):
 class UCBAcquisition(Acquisition):
     """UCB acquisition function."""
 
-    def __init__(self, model: SurrogateModel, beta: float = 0.1):
+    def __init__(self, model: SurrogateModel, beta: float = 1.0):
         self.beta = beta
         self.update(model)
 
