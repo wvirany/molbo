@@ -5,7 +5,7 @@ from botorch.optim import optimize_acqf, optimize_acqf_discrete
 
 from molbo.acquisition import Acquisition
 from molbo.models import SurrogateModel
-from molbo.oracle import Oracle
+from molbo.oracles import Oracle
 
 
 class BOLoop:
@@ -15,7 +15,7 @@ class BOLoop:
     Args:
         model: Surrogate model
         acquisition: Acquisition
-        oracle: TODO
+        oracle: Oracle
         is_continuous: bool (default True) Whether the input space is continuous or discrete
         candidates: torch.Tensor (default None) B x N x d candidate points for discrete optimization
 
@@ -67,7 +67,7 @@ class BOLoop:
             )
 
             # Evaluate oracle
-            new_y = self.oracle(new_X).unsqueeze(-1)
+            new_y = self.oracle(new_X)
 
             # Update model training data
             self.model.update(new_X, new_y)

@@ -19,21 +19,49 @@ class Acquisition(ABC):
     """Wrapper for BoTorch acquisition functions."""
 
     def get_observation(self, oracle, is_continuous: bool = True, candidates=None):
-        if is_continuous:
-            new_X, acq_val = optimize_acqf(
-                acq_function=self.acq_func,
-                bounds=oracle.bounds,
-                q=1,
-                num_restarts=5,
-                raw_samples=20,
-            )
+
+        # Sample proportionately to acquisition function
+        if self.sample:
+            # Create dense grid over bounds
+            X_grid = torch.linspace(
+                oracle.bounds[0].item(), oracle.bounds[1].item(), 1000, dtype=torch.float64
+            ).unsqueeze(
+                -1
+            )  # (1000, 1)
+
+            # Evaluate acquisition function
+            acq_values = self.acq_func(X_grid.reshape(-1, 1, 1))  # (1000, 1, 1)
+            acq_values = acq_values.squeeze()  # (1000,)
+
+            # Normalize and sample
+            probs = acq_values / acq_values.sum()
+            indices = torch.multinomial(
+                probs, num_samples=self.sample_batch_size
+            )  # (sample_batch_size,)
+
+            # Take top sample from batch
+            sampled_acq = acq_values[indices]
+            best_idx = sampled_acq.argmax()
+            new_X = X_grid[indices[best_idx]].unsqueeze(-1)
+            acq_val = sampled_acq[best_idx]
+
+        # Maximize acquisition function
         else:
-            new_X, acq_val = optimize_acqf_discrete(
-                acq_function=self.acq_func,
-                bounds=oracle.bounds,
-                q=1,
-                choices=candidates,
-            )
+            if is_continuous:
+                new_X, acq_val = optimize_acqf(
+                    acq_function=self.acq_func,
+                    bounds=oracle.bounds,
+                    q=1,
+                    num_restarts=5,
+                    raw_samples=20,
+                )
+            else:
+                new_X, acq_val = optimize_acqf_discrete(
+                    acq_function=self.acq_func,
+                    bounds=oracle.bounds,
+                    q=1,
+                    choices=candidates,
+                )
 
         return new_X, acq_val
 
@@ -49,7 +77,9 @@ class Acquisition(ABC):
 class EIAcquisition(Acquisition):
     """Expected improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel):
+    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
@@ -61,7 +91,9 @@ class EIAcquisition(Acquisition):
 class LogEIAcquisition(Acquisition):
     """Log expected improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel):
+    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
@@ -73,7 +105,9 @@ class LogEIAcquisition(Acquisition):
 class PIAcquisition(Acquisition):
     """Probability of improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel):
+    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
@@ -85,7 +119,9 @@ class PIAcquisition(Acquisition):
 class LogPIAcquisition(Acquisition):
     """Log probability of improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel):
+    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
@@ -97,8 +133,16 @@ class LogPIAcquisition(Acquisition):
 class UCBAcquisition(Acquisition):
     """UCB acquisition function."""
 
-    def __init__(self, model: SurrogateModel, beta: float = 1.0):
+    def __init__(
+        self,
+        model: SurrogateModel,
+        beta: float = 1.0,
+        sample: bool = False,
+        sample_batch_size: int = 1,
+    ):
         self.beta = beta
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
@@ -109,7 +153,9 @@ class UCBAcquisition(Acquisition):
 class TSAcquisition(Acquisition):
     """Thompson sampling acquisition function."""
 
-    def __init__(self, model: SurrogateModel):
+    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
@@ -120,8 +166,16 @@ class TSAcquisition(Acquisition):
 class KGAcquisition(Acquisition):
     """Knowledge gradient acquisition function."""
 
-    def __init__(self, model: SurrogateModel, num_fantasies: int = 4):
+    def __init__(
+        self,
+        model: SurrogateModel,
+        num_fantasies: int = 4,
+        sample: bool = False,
+        sample_batch_size: int = 1,
+    ):
         self.num_fantasies = num_fantasies
+        self.sample = sample
+        self.sample_batch_size = sample_batch_size
         self.update(model)
 
     def update(self, model: SurrogateModel):
