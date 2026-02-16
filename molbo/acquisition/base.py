@@ -18,10 +18,13 @@ from molbo.models.base import SurrogateModel
 class Acquisition(ABC):
     """Wrapper for BoTorch acquisition functions."""
 
-    def get_observation(self, oracle, is_continuous: bool = True, candidates=None):
+    def get_observation(self, oracle, candidates=None):
 
         # Sample proportionately to acquisition function
         if self.sample:
+            assert (
+                oracle.bounds.shape[-1] == 1
+            ), "Sampling currently only implemented for 1D functions"
             # Create dense grid over bounds
             X_grid = torch.linspace(
                 oracle.bounds[0].item(), oracle.bounds[1].item(), 1000, dtype=torch.float64
@@ -47,20 +50,19 @@ class Acquisition(ABC):
 
         # Maximize acquisition function
         else:
-            if is_continuous:
+            if candidates is not None:
+                # Discrete setting
+                new_X, acq_val = optimize_acqf_discrete(
+                    acq_function=self.acq_func, q=1, choices=candidates, X_avoid=self.model.train_X
+                )
+            else:
+                # Continuous setting
                 new_X, acq_val = optimize_acqf(
                     acq_function=self.acq_func,
                     bounds=oracle.bounds,
                     q=1,
                     num_restarts=5,
                     raw_samples=20,
-                )
-            else:
-                new_X, acq_val = optimize_acqf_discrete(
-                    acq_function=self.acq_func,
-                    bounds=oracle.bounds,
-                    q=1,
-                    choices=candidates,
                 )
 
         return new_X, acq_val

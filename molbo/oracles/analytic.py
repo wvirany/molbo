@@ -1,4 +1,4 @@
-from molbo.oracles import Oracle
+from molbo.oracles.base import Oracle
 
 
 class AnalyticOracle(Oracle):

@@ -1,2 +1,2 @@
 from .base import SurrogateModel
-from .gp import GPModel
+from .gp import GPModel, TanimotoGPModel

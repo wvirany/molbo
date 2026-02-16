@@ -27,14 +27,12 @@ class BOLoop:
         model: SurrogateModel,
         acq_func: Acquisition,
         oracle: Oracle,
-        is_continuous: bool = True,
         candidates: torch.Tensor = None,
         metrics=None,
     ):
         self.model = model
         self.acq_func = acq_func
         self.oracle = oracle
-        self.is_continuous = is_continuous
         self.candidates = candidates
         self.metrics = metrics
 
@@ -62,9 +60,7 @@ class BOLoop:
             self.acq_func.update(self.model)
 
             # Query acquisition function
-            new_X, acq_val = self.acq_func.get_observation(
-                self.oracle, self.is_continuous, self.candidates
-            )
+            new_X, acq_val = self.acq_func.get_observation(self.oracle, self.candidates)
 
             # Evaluate oracle
             new_y = self.oracle(new_X)

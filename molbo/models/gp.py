@@ -1,10 +1,17 @@
+# Suppress warnings - these are safe to ignore for molecular fingerprints
+import warnings
+
+import gpytorch
 import torch
 from botorch.fit import fit_gpytorch_mll
 from botorch.models import SingleTaskGP
 from botorch.models.transforms.input import Normalize
+from gauche.kernels.fingerprint_kernels.tanimoto_kernel import TanimotoKernel
 from gpytorch.mlls import ExactMarginalLogLikelihood
 
 from molbo.models.base import SurrogateModel
+
+warnings.filterwarnings("ignore")
 
 
 class GPModel(SurrogateModel):
@@ -44,3 +51,23 @@ class GPModel(SurrogateModel):
         with torch.no_grad():
             output = self.model(self.train_X)
             return self.mll(output, self.train_y.squeeze())
+
+
+class TanimotoGP(SingleTaskGP):
+    """GP with min-max (Tanimoto) kernel for molecular fingerprints."""
+
+    def __init__(self, train_X, train_y):
+        super().__init__(train_X, train_y)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.covar_module = gpytorch.kernels.ScaleKernel(TanimotoKernel())
+
+
+class TanimotoGPModel(GPModel):
+    """Wrapper for TanimotoGP model."""
+
+    def init_gp(self, train_X, train_y, state_dict=None):
+        self.model = TanimotoGP(train_X, train_y)
+        self.mll = ExactMarginalLogLikelihood(self.model.likelihood, self.model)
+
+        if state_dict is not None:
+            self.model.load_state_dict(state_dict)
