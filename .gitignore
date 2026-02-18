@@ -1,6 +1,5 @@
 docs/
 notebooks/
-mfal_env/
 
 # WandB
 wandb/
