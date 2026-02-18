@@ -38,10 +38,7 @@ class GPModel(SurrogateModel):
     def update(self, new_X, new_y):
         self.train_X = torch.cat([self.train_X, new_X])
         self.train_y = torch.cat([self.train_y, new_y])
-        self.init_gp(
-            self.train_X,
-            self.train_y,
-        )
+        self.initialize(self.train_X, self.train_y)
 
     def __call__(self, X):
         self.model.eval()
@@ -68,7 +65,7 @@ class TanimotoGP(SingleTaskGP):
 class TanimotoGPModel(GPModel):
     """Wrapper for TanimotoGP model."""
 
-    def init_gp(self, train_X, train_y, state_dict=None):
+    def initialize(self, train_X, train_y, state_dict=None):
 
         self.train_X = train_X
         self.train_y = train_y
