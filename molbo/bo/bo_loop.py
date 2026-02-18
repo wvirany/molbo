@@ -4,8 +4,9 @@ import torch
 from botorch.optim import optimize_acqf, optimize_acqf_discrete
 
 from molbo.acquisition import Acquisition
+from molbo.bo.bo_metrics import BOMetrics
 from molbo.models import SurrogateModel
-from molbo.oracles import Oracle
+from molbo.oracle import Oracle
 
 
 class BOLoop:
@@ -30,7 +31,7 @@ class BOLoop:
         acq_func: Acquisition,
         oracle: Oracle,
         candidates: torch.Tensor = None,
-        metrics=None,
+        metrics: BOMetrics = None,
     ):
         self.model = model
         self.acq_func = acq_func

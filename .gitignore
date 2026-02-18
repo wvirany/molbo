@@ -1,5 +1,9 @@
 docs/
 notebooks/
+.ruff_cache
+
+# Hydra
+outputs/
 
 # WandB
 wandb/

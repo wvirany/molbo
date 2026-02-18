@@ -4,7 +4,7 @@ A collection of factory functions to generate AnalyticOracle objects for differe
 
 import torch
 
-from molbo.oracles import AnalyticOracle
+from molbo.oracle import AnalyticOracle
 
 
 def gaussian_mixture_1d(noise_std=0.0):

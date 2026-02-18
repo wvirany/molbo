@@ -1,4 +1,4 @@
-from molbo.oracles.base import Oracle
+from molbo.oracle.base import Oracle
 
 
 class LookupOracle(Oracle):
