@@ -24,6 +24,8 @@ class BOLoop:
 
     def __init__(
         self,
+        train_X,
+        train_y,
         model: SurrogateModel,
         acq_func: Acquisition,
         oracle: Oracle,
@@ -37,8 +39,8 @@ class BOLoop:
         self.metrics = metrics
 
         self.history = {
-            "X_init": model.train_X,
-            "y_init": model.train_y,
+            "X_init": train_X,
+            "y_init": train_y,
             "X_observed": torch.tensor([], dtype=torch.float64),
             "y_observed": torch.tensor([], dtype=torch.float64),
             "acq_vals": [],
@@ -46,6 +48,8 @@ class BOLoop:
             "time_per_iter": [],
             "model_loss": [],
         }
+
+        self.model.initialize(train_X, train_y)
 
         if self.metrics is not None:
             self.metrics.initialize(self.history)

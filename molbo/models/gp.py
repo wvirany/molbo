@@ -17,12 +17,15 @@ warnings.filterwarnings("ignore")
 class GPModel(SurrogateModel):
     """A wrapper for SingleTaskGP that implements the SurrogateModel interface"""
 
-    def __init__(self, train_X, train_y, state_dict=None):
+    def __init__(self, state_dict=None):
+        self.train_X = torch.tensor([])
+        self.train_y = torch.tensor([])
+
+    def initialize(self, train_X, train_y, state_dict=None):
+
         self.train_X = train_X
         self.train_y = train_y
-        self.init_gp(train_X, train_y, state_dict)
 
-    def init_gp(self, train_X, train_y, state_dict=None):
         self.model = SingleTaskGP(train_X, train_y, input_transform=Normalize(d=train_X.shape[-1]))
         self.mll = ExactMarginalLogLikelihood(self.model.likelihood, self.model)
 
@@ -66,6 +69,10 @@ class TanimotoGPModel(GPModel):
     """Wrapper for TanimotoGP model."""
 
     def init_gp(self, train_X, train_y, state_dict=None):
+
+        self.train_X = train_X
+        self.train_y = train_y
+
         self.model = TanimotoGP(train_X, train_y)
         self.mll = ExactMarginalLogLikelihood(self.model.likelihood, self.model)
 

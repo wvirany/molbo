@@ -3,10 +3,19 @@ from molbo.oracles.base import Oracle
 
 class AnalyticOracle(Oracle):
 
-    def __init__(self, f, bounds, noise_std=0.0, optimal_value=None):
+    def __init__(self, f, bounds, dim, noise_std=0.0, optimal_value=None):
+        """
+        Args:
+            f: (Callable) Analytic form of objective function
+            bounds: (2, d) tensor matching botorch.optim.optimize_acqf()
+            dim: Number of input dimensions
+            noise_std: (m) tensor with noise std for each output dim
+            optimal_value: Max of function
+        """
         super().__init__(noise_std)
         self.f = f
         self.bounds = bounds
+        self.dim = dim
         self._optimal_value = optimal_value
 
     def _evaluate(self, X):

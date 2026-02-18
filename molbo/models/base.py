@@ -7,6 +7,10 @@ class SurrogateModel(ABC):
     """Base class for surrogate models"""
 
     @abstractmethod
+    def initialize(self, train_X, train_y):
+        pass
+
+    @abstractmethod
     def fit(self):
         """
         Fit model to training data.

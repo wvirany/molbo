@@ -8,14 +8,17 @@ class LookupOracle(Oracle):
     Data is stored as (X, y) pairs.
     """
 
-    def __init__(self, X_data, y_data, noise_std=0.0):
+    def __init__(self, X_data, y_data, dim, noise_std=0.0):
         """
         Args:
             X_data: (N, d) tensor of input features
             y_data: (N, m) tensor of outputs
+            dim: Number of input dimensions
             noise_std: (m) tensor with noise std for each output dim
         """
         super().__init__(noise_std)
+        self.dim = dim
+
         self.X_data = X_data
         self.y_data = y_data
 

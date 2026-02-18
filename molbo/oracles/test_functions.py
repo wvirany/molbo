@@ -24,4 +24,10 @@ def gaussian_mixture_1d(noise_std=0.0):
         g6 = 0.1 * pdf(X, mean=10.1, std=0.6)
         return 10 * (g1 + g2 + g3 + g4 + g5 + g6)
 
-    return AnalyticOracle(f=f, bounds=(0.0, 10.0), noise_std=noise_std, optimal_value=1.791)
+    return AnalyticOracle(
+        f=f,
+        bounds=torch.tensor([0.0, 10.0]).unsqueeze(-1),
+        dim=1,
+        noise_std=noise_std,
+        optimal_value=1.791,
+    )

@@ -1,0 +1,22 @@
+bo:
+  n_init: 3
+  n_iters: 25
+
+oracle:
+  name: gaussian_mixture_1d
+  noise_std: 0.1
+
+seeds: [0, 1, 2, 3, 4]
+
+wandb:
+  project: molbo
+  tags: [ei_vs_ucb, 1d]
+
+runs:
+  - name: EI
+    acquisition:
+      name: EIAcquisition
+  - name: UCB_beta1
+    acquisition:
+      name: UCBAcquisition
+      beta: 1.0

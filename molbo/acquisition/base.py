@@ -79,10 +79,10 @@ class Acquisition(ABC):
 class EIAcquisition(Acquisition):
     """Expected improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+    def __init__(self, sample: bool = False, sample_batch_size: int = 1):
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
@@ -93,10 +93,10 @@ class EIAcquisition(Acquisition):
 class LogEIAcquisition(Acquisition):
     """Log expected improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+    def __init__(self, sample: bool = False, sample_batch_size: int = 1):
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
@@ -107,10 +107,10 @@ class LogEIAcquisition(Acquisition):
 class PIAcquisition(Acquisition):
     """Probability of improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+    def __init__(self, sample: bool = False, sample_batch_size: int = 1):
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
@@ -121,10 +121,10 @@ class PIAcquisition(Acquisition):
 class LogPIAcquisition(Acquisition):
     """Log probability of improvement acquisition function."""
 
-    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+    def __init__(self, sample: bool = False, sample_batch_size: int = 1):
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
@@ -137,7 +137,6 @@ class UCBAcquisition(Acquisition):
 
     def __init__(
         self,
-        model: SurrogateModel,
         beta: float = 1.0,
         sample: bool = False,
         sample_batch_size: int = 1,
@@ -145,7 +144,7 @@ class UCBAcquisition(Acquisition):
         self.beta = beta
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
@@ -155,10 +154,10 @@ class UCBAcquisition(Acquisition):
 class TSAcquisition(Acquisition):
     """Thompson sampling acquisition function."""
 
-    def __init__(self, model: SurrogateModel, sample: bool = False, sample_batch_size: int = 1):
+    def __init__(self, sample: bool = False, sample_batch_size: int = 1):
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
@@ -170,7 +169,6 @@ class KGAcquisition(Acquisition):
 
     def __init__(
         self,
-        model: SurrogateModel,
         num_fantasies: int = 4,
         sample: bool = False,
         sample_batch_size: int = 1,
@@ -178,7 +176,7 @@ class KGAcquisition(Acquisition):
         self.num_fantasies = num_fantasies
         self.sample = sample
         self.sample_batch_size = sample_batch_size
-        self.update(model)
+        self.model = None
 
     def update(self, model: SurrogateModel):
         self.model = model
