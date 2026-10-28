@@ -9,9 +9,9 @@ from botorch.models.transforms.input import Normalize
 from gauche.kernels.fingerprint_kernels.tanimoto_kernel import TanimotoKernel
 from gpytorch.mlls import ExactMarginalLogLikelihood
 
-from molbo.model import SurrogateModel
-from molbo.model.featurizer import Featurizer, IdentityFeaturizer
-from molbo.model.modules import FixedNoise, FixedObservationMean, FixedRBFKernel
+from molbo.surrogates import SurrogateModel
+from molbo.surrogates.featurizer import Featurizer, IdentityFeaturizer
+from molbo.surrogates.utils.gp_modules import FixedNoise, FixedObservationMean, FixedRBFKernel
 
 warnings.filterwarnings("ignore")
 

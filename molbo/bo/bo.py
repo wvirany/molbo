@@ -6,8 +6,8 @@ from tqdm import tqdm
 from molbo.acqf_optimizer import AcqfOptimizer
 from molbo.acquisition import Acquisition
 from molbo.bo.history import History
-from molbo.model import SurrogateModel
-from molbo.oracle import Oracle
+from molbo.oracles import Oracle
+from molbo.surrogates import SurrogateModel
 
 
 class BOLoop:

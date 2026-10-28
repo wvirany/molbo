@@ -1,6 +1,6 @@
 import torch
 
-from molbo.oracle.base import Oracle
+from molbo.oracles.base import Oracle
 
 
 class LookupOracle(Oracle):

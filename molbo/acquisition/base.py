@@ -12,7 +12,7 @@ from botorch.acquisition.analytic import (
 from botorch.acquisition.knowledge_gradient import qKnowledgeGradient
 from botorch.acquisition.thompson_sampling import PathwiseThompsonSampling
 
-from molbo.model.base import SurrogateModel
+from molbo.surrogates.base import SurrogateModel
 
 
 class Acquisition(ABC):

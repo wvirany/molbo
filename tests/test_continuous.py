@@ -5,8 +5,8 @@ import torch
 from molbo.acqf_optimizer.continuous import ContinuousMaximizer
 from molbo.acquisition.base import LogEIAcquisition
 from molbo.bo import BOLoop, History
-from molbo.model.gp import GPModel
-from molbo.oracle import AnalyticOracle
+from molbo.oracles import AnalyticOracle
+from molbo.surrogates.gp import GPModel
 
 
 def _make_oracle():

@@ -15,7 +15,7 @@ from botorch.test_functions import (
     StyblinskiTang,
 )
 
-from molbo.oracle import AnalyticOracle
+from molbo.oracles import AnalyticOracle
 
 
 def gaussian_mixture_1d(noise_std=0.0):

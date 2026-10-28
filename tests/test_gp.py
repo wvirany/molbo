@@ -7,8 +7,8 @@ the featurizer works (TanimotoGPModel accepts SMILES), and the fit warning works
 import pytest
 import torch
 
-from molbo.model.featurizer import IdentityFeaturizer, MorganFingerprintFeaturizer
-from molbo.model.gp import GPModel, TanimotoGPModel
+from molbo.surrogates.featurizer import IdentityFeaturizer, MorganFingerprintFeaturizer
+from molbo.surrogates.gp import GPModel, TanimotoGPModel
 
 # --- Fixtures -------------------------------------------------------------
 

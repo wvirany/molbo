@@ -6,8 +6,8 @@ from molbo.acqf_optimizer.pool import PoolMaximizer, PoolSampler, _optimize_acqf
 from molbo.acquisition.base import LogEIAcquisition
 from molbo.acquisition.monte_carlo import qLogEIAcquisition
 from molbo.bo import BOLoop, History
-from molbo.model.gp import TanimotoGPModel
-from molbo.oracle.lookup import LookupOracle
+from molbo.oracles.lookup import LookupOracle
+from molbo.surrogates.gp import TanimotoGPModel
 
 N, D, N_INIT = 30, 16, 5
 

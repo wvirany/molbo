@@ -4,7 +4,7 @@ from typing import List, Optional
 import torch
 from rdkit.Chem import QED, MolFromSmiles
 
-from molbo.oracle.base import Oracle
+from molbo.oracles.base import Oracle
 
 
 class MolecularOracle(Oracle):
