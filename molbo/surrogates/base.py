@@ -4,7 +4,7 @@ from typing import Any
 import torch
 
 
-class SurrogateModel(ABC):
+class Surrogate(ABC):
     """Base class for surrogate models."""
 
     @abstractmethod

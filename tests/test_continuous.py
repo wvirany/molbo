@@ -6,7 +6,7 @@ from molbo.acqf_optimizer.continuous import ContinuousMaximizer
 from molbo.acquisition.base import LogEIAcquisition
 from molbo.bo import BOLoop, History
 from molbo.oracles import AnalyticOracle
-from molbo.surrogates.gp import GPModel
+from molbo.surrogates.gp import GPSurrogate
 
 
 def _make_oracle():
@@ -26,7 +26,7 @@ def test_continuous_run_completes():
 
     bo_loop = BOLoop(
         history=history,
-        model=GPModel(),
+        surrogate=GPSurrogate(),
         acq_func=LogEIAcquisition(),
         oracle=oracle,
         acqf_optimizer=optimizer,
@@ -57,7 +57,7 @@ def test_continuous_resume(tmp_path):
     )
     BOLoop(
         history=history,
-        model=GPModel(),
+        surrogate=GPSurrogate(),
         acq_func=LogEIAcquisition(),
         oracle=oracle,
         acqf_optimizer=optimizer,
@@ -70,7 +70,7 @@ def test_continuous_resume(tmp_path):
 
     BOLoop(
         history=resumed,
-        model=GPModel(),
+        surrogate=GPSurrogate(),
         acq_func=LogEIAcquisition(),
         oracle=oracle,
         acqf_optimizer=optimizer,

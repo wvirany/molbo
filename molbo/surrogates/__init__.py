@@ -1,3 +1,3 @@
-from .base import SurrogateModel
-from .gp import GPModel, TanimotoGPModel
+from .base import Surrogate
+from .gp import GPSurrogate, TanimotoGPSurrogate
 from .utils.gp_modules import *

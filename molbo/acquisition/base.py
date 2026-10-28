@@ -12,26 +12,28 @@ from botorch.acquisition.analytic import (
 from botorch.acquisition.knowledge_gradient import qKnowledgeGradient
 from botorch.acquisition.thompson_sampling import PathwiseThompsonSampling
 
-from molbo.surrogates.base import SurrogateModel
+from molbo.surrogates.base import Surrogate
 
 
 class Acquisition(ABC):
     """Wrapper for BoTorch acquisition functions."""
 
-    def update(self, model: SurrogateModel):
+    def update(self, surrogate: Surrogate):
         """Update the acquisition function with a fitted surrogate model."""
-        if not model.is_fitted:
-            raise RuntimeError("Acquisition received an unfitted model. Call model.fit() first.")
-        self.model = model
+        if not surrogate.is_fitted:
+            raise RuntimeError(
+                "Acquisition received an unfitted model. Call surrogate.fit() first."
+            )
+        self.surrogate = surrogate
         self._update()
 
     @abstractmethod
     def _update(self):
-        """Build the BoTorch acquisition function from self.model."""
+        """Build the BoTorch acquisition function from self.surrogate."""
         ...
 
     def __call__(self, X):
-        X_f = self.model.featurizer(X)
+        X_f = self.surrogate.featurizer(X)
         return self.acq_func(X_f.reshape(-1, 1, X_f.shape[-1]))
 
 
@@ -39,32 +41,32 @@ class EIAcquisition(Acquisition):
     """Expected improvement acquisition function."""
 
     def _update(self):
-        self.best_f = self.model.train_y.max().item()
-        self.acq_func = ExpectedImprovement(model=self.model.model, best_f=self.best_f)
+        self.best_f = self.surrogate.train_y.max().item()
+        self.acq_func = ExpectedImprovement(model=self.surrogate.model, best_f=self.best_f)
 
 
 class LogEIAcquisition(Acquisition):
     """Log expected improvement acquisition function."""
 
     def _update(self):
-        self.best_f = self.model.train_y.max().item()
-        self.acq_func = LogExpectedImprovement(model=self.model.model, best_f=self.best_f)
+        self.best_f = self.surrogate.train_y.max().item()
+        self.acq_func = LogExpectedImprovement(model=self.surrogate.model, best_f=self.best_f)
 
 
 class PIAcquisition(Acquisition):
     """Probability of improvement acquisition function."""
 
     def _update(self):
-        self.best_f = self.model.train_y.max().item()
-        self.acq_func = ProbabilityOfImprovement(model=self.model.model, best_f=self.best_f)
+        self.best_f = self.surrogate.train_y.max().item()
+        self.acq_func = ProbabilityOfImprovement(model=self.surrogate.model, best_f=self.best_f)
 
 
 class LogPIAcquisition(Acquisition):
     """Log probability of improvement acquisition function."""
 
     def _update(self):
-        self.best_f = self.model.train_y.max().item()
-        self.acq_func = LogProbabilityOfImprovement(model=self.model.model, best_f=self.best_f)
+        self.best_f = self.surrogate.train_y.max().item()
+        self.acq_func = LogProbabilityOfImprovement(model=self.surrogate.model, best_f=self.best_f)
 
 
 class UCBAcquisition(Acquisition):
@@ -74,21 +76,21 @@ class UCBAcquisition(Acquisition):
         self.beta = beta
 
     def _update(self):
-        self.acq_func = UpperConfidenceBound(model=self.model.model, beta=self.beta)
+        self.acq_func = UpperConfidenceBound(model=self.surrogate.model, beta=self.beta)
 
 
 class PosteriorMeanAcquisition(Acquisition):
     """Posterior mean acquisition function."""
 
     def _update(self):
-        self.acq_func = PosteriorMean(model=self.model.model)
+        self.acq_func = PosteriorMean(model=self.surrogate.model)
 
 
 class TSAcquisition(Acquisition):
     """Thompson sampling acquisition function."""
 
     def _update(self):
-        self.acq_func = PathwiseThompsonSampling(self.model.model)
+        self.acq_func = PathwiseThompsonSampling(self.surrogate.model)
 
 
 class KGAcquisition(Acquisition):
@@ -99,8 +101,12 @@ class KGAcquisition(Acquisition):
 
     def _update(self):
         with torch.no_grad():
-            current_value = self.model.model.posterior(self.model.model.train_inputs[0]).mean.max()
+            current_value = self.surrogate.model.posterior(
+                self.surrogate.model.train_inputs[0]
+            ).mean.max()
 
         self.acq_func = qKnowledgeGradient(
-            model=self.model.model, num_fantasies=self.num_fantasies, current_value=current_value
+            model=self.surrogate.model,
+            num_fantasies=self.num_fantasies,
+            current_value=current_value,
         )

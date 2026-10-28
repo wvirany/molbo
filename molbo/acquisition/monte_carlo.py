@@ -19,9 +19,9 @@ class qEIAcquisition(Acquisition):
         self.sampler = sampler
 
     def _update(self):
-        self.best_f = self.model.train_y.max().item()
+        self.best_f = self.surrogate.train_y.max().item()
         self.acq_func = qExpectedImprovement(
-            model=self.model.model, best_f=self.best_f, sampler=self.sampler
+            model=self.surrogate.model, best_f=self.best_f, sampler=self.sampler
         )
 
 
@@ -32,9 +32,9 @@ class qLogEIAcquisition(Acquisition):
         self.sampler = sampler
 
     def _update(self):
-        self.best_f = self.model.train_y.max().item()
+        self.best_f = self.surrogate.train_y.max().item()
         self.acq_func = qLogExpectedImprovement(
-            model=self.model.model, best_f=self.best_f, sampler=self.sampler
+            model=self.surrogate.model, best_f=self.best_f, sampler=self.sampler
         )
 
 
@@ -47,7 +47,7 @@ class qUCBAcquisition(Acquisition):
 
     def _update(self):
         self.acq_func = qUpperConfidenceBound(
-            model=self.model.model, beta=self.beta, sampler=self.sampler
+            model=self.surrogate.model, beta=self.beta, sampler=self.sampler
         )
 
 

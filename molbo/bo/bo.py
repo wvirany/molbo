@@ -7,7 +7,7 @@ from molbo.acqf_optimizer import AcqfOptimizer
 from molbo.acquisition import Acquisition
 from molbo.bo.history import History
 from molbo.oracles import Oracle
-from molbo.surrogates import SurrogateModel
+from molbo.surrogates import Surrogate
 
 
 class BOLoop:
@@ -18,7 +18,7 @@ class BOLoop:
         history: History object tracking observations, metrics, logging, and checkpointing.
                  Pass a freshly constructed History for a new run, or use History.load()
                  to resume from a checkpoint.
-        model: Surrogate model
+        surrogate: Surrogate model
         acq_func: Acquisition function
         oracle: Oracle
         acqf_optimizer: Acquisition function optimizer
@@ -29,7 +29,7 @@ class BOLoop:
     def __init__(
         self,
         history: History,
-        model: SurrogateModel,
+        surrogate: Surrogate,
         acq_func: Acquisition,
         oracle: Oracle,
         acqf_optimizer: AcqfOptimizer,
@@ -37,16 +37,16 @@ class BOLoop:
         device: str = "cpu",
     ):
         self.history = history
-        self.model = model
+        self.surrogate = surrogate
         self.acq_func = acq_func
         self.oracle = oracle
         self.acqf_optimizer = acqf_optimizer
         self.candidates = candidates
         self.device = device
 
-        # Initialize model from all data seen so far (handles fresh start and resume)
+        # Initialize surrogate model from all data seen so far (handles fresh start and resume)
         X_all = history.X_all
-        self.model.initialize(
+        self.surrogate.initialize(
             X_all.to(device) if torch.is_tensor(X_all) else X_all, history.y_all.to(device)
         )
 
@@ -58,9 +58,9 @@ class BOLoop:
             position=0,
             leave=True,
         ):
-            # Update model and acquisition function
-            self.model.fit()
-            self.acq_func.update(self.model)
+            # Update surrogate model and acquisition function
+            self.surrogate.fit()
+            self.acq_func.update(self.surrogate)
 
             # Pool-based
             if self.candidates is not None:
@@ -74,14 +74,14 @@ class BOLoop:
                 result = self.acqf_optimizer.optimize(self.acq_func)
                 new_y = self.oracle(result.new_X).to(self.device)
 
-            # Update model
-            self.model.update(result.new_X, new_y)
+            # Update surrogate model
+            self.surrogate.update(result.new_X, new_y)
 
             # Update history (handles metrics, logging, checkpointing)
             self.history.update(
                 result=result,
                 new_y=new_y,
-                model_loss=self.model.loss().item(),
+                surrogate_loss=self.surrogate.loss().item(),
                 iteration=i,
                 observed_indices=result.observed_indices,
             )

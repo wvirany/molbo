@@ -63,7 +63,7 @@ class History:
         self.y_observed = torch.tensor([], dtype=y_init.dtype)
         self.acq_vals = []
         self.iteration = []
-        self.model_loss = []
+        self.surrogate_loss = []
         self.optimization_time = []
         self.metrics_history = []
 
@@ -75,7 +75,7 @@ class History:
         self,
         result: OptimizationResult,
         new_y: torch.Tensor,
-        model_loss: float,
+        surrogate_loss: float,
         iteration: int,
         observed_indices: Optional[List[int]] = None,
     ) -> None:
@@ -84,7 +84,7 @@ class History:
         Args:
             result: Output of AcqfOptimizer.optimize()
             new_y: (q, 1) oracle evaluations for the proposed candidates
-            model_loss: Current model MLL
+            surrogate_loss: Current surrogate model loss
             iteration: Current iteration index
             observed_indices: Indices of evaluated candidates (pool setting only)
         """
@@ -95,7 +95,7 @@ class History:
         # Scalar bookkeeping
         self.acq_vals.extend(result.acq_val.reshape(-1).tolist())
         self.iteration.append(iteration)
-        self.model_loss.append(model_loss)
+        self.surrogate_loss.append(surrogate_loss)
         self.optimization_time.append(result.optimization_time)
 
         # Pool-setting indices
@@ -167,7 +167,7 @@ class History:
                 "observed_indices": self.observed_indices,
                 "acq_vals": self.acq_vals,
                 "iteration": self.iteration,
-                "model_loss": self.model_loss,
+                "surrogate_loss": self.surrogate_loss,
                 "optimization_time": self.optimization_time,
                 "metrics_history": self.metrics_history,
                 "rng_state": torch.get_rng_state(),
@@ -205,7 +205,8 @@ class History:
         history.y_observed = data["y_observed"]
         history.acq_vals = data["acq_vals"]
         history.iteration = data["iteration"]
-        history.model_loss = data["model_loss"]
+        # Was model_loss in checkpoints saved before v0.4.0
+        history.surrogate_loss = data.get("surrogate_loss", data.get("model_loss", []))
         history.optimization_time = data["optimization_time"]
         history.metrics_history = data.get("metrics_history", [])
 

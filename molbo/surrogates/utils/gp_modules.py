@@ -1,7 +1,7 @@
 """
 Modules for specifying fixed GP parameters.
 
-These don't get updated when fit() is called by BOLoop, but are updated by GPModel._init_modules()
+These don't get updated when fit() is called by BOLoop, but are updated by GPSurrogate._init_modules()
 """
 
 import gpytorch

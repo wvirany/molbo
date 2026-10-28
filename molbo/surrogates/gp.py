@@ -9,15 +9,15 @@ from botorch.models.transforms.input import Normalize
 from gauche.kernels.fingerprint_kernels.tanimoto_kernel import TanimotoKernel
 from gpytorch.mlls import ExactMarginalLogLikelihood
 
-from molbo.surrogates import SurrogateModel
+from molbo.surrogates import Surrogate
 from molbo.surrogates.featurizer import Featurizer, IdentityFeaturizer
 from molbo.surrogates.utils.gp_modules import FixedNoise, FixedObservationMean, FixedRBFKernel
 
 warnings.filterwarnings("ignore")
 
 
-class GPModel(SurrogateModel):
-    """A wrapper for SingleTaskGP that implements the SurrogateModel interface.
+class GPSurrogate(Surrogate):
+    """A wrapper for SingleTaskGP that implements the Surrogate interface.
 
     Candidate data is automatically mapped to tensors via a Featurizer object.
 
@@ -138,13 +138,13 @@ class TanimotoGP(SingleTaskGP):
         )
 
 
-class TanimotoGPModel(GPModel):
+class TanimotoGPSurrogate(GPSurrogate):
     """GP surrogate model with a Tanimoto kernel.
 
     Expects pre-featurized inputs (e.g. Morgan fingerprints) by default.
     To featurize SMILES automatically, pass a featurizer explicitly:
 
-    model = TanimotoGPModel(featurizer=MorganFingerprintFeaturizer())
+    model = TanimotoGPSurrogate(featurizer=MorganFingerprintFeaturizer())
     """
 
     def _build_model(self):
